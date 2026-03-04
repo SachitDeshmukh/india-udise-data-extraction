@@ -45,7 +45,7 @@ def start_driver(url: str):
         # Open the UDISE Know Your School portal
         driver.get(url)
 
-        logging.info(f"Driver successfully initiated for url: {target_website_url}")
+        logging.info(f"Driver successfully initiated for url: {url}")
 
         # Return the driver object so other functions can use it
         return driver
@@ -88,6 +88,8 @@ def click_advanced_search(driver):
 def main():
     driver = start_driver(target_website_url)
     click_advanced_search(driver)
+
+    return driver
 
 
 if __name__ == "__main__":
