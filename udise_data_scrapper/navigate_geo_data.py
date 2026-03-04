@@ -56,89 +56,110 @@ def get_dropdown_options(select_element):
         )
 
 
-def scrape_state_list():
+class Navigator:
     """
-    Scrapes the list of all states and union teritories on the "State" dropdown.
+    A class for scraping state and district dropdown data from a webpage.
 
-    Returns
-    -------
-    list of str values
+    Attributes
+    ----------
+    driver : webdriver
+        The Selenium WebDriver instance used for scraping.
     """
 
-    driver = webDriver
+    def __init__(self, web_driver):
+        """
+        Parameters
+        ----------
+        web_driver : webdriver
+            The Selenium WebDriver instance to use for scraping.
+        """
+        self.driver = web_driver
 
-    # Allow webpage time to load initial dropdowns
-    time.sleep(3)
+    def scrape_state_list(self):
+        """
+        Scrapes the list of all states and union territories on the "State" dropdown.
 
-    try:
-        state_dropdown = Select(
-            driver.find_element(
-                By.XPATH, "//label[normalize-space()='State']/following::select[1]"
+        Returns
+        -------
+        tuple : (Select, list of str)
+            The state dropdown element and a list of state names.
+        """
+
+        # Allow webpage time to load initial dropdowns
+        time.sleep(3)
+
+        try:
+            state_dropdown = Select(
+                self.driver.find_element(
+                    By.XPATH, "//label[normalize-space()='State']/following::select[1]"
+                )
             )
-        )
 
-    except Exception as e:
-        logging.error(f"Unable to locate data by provided element type.")
+        except Exception as e:
+            logging.error("Unable to locate data by provided element type.")
+            raise
 
-    state_list = get_dropdown_options(state_dropdown._el)
+        state_list = get_dropdown_options(state_dropdown._el)
 
-    return state_dropdown, state_list
+        return state_dropdown, state_list
 
+    def scrape_district_list(self):
+        """
+        Scrapes the list of districts for each state on the "District" dropdown.
 
-def scrape_district_list():
-    """
-    Scrapes the list of districts for each state on the "District" dropdown.
+        Returns
+        -------
+        list of dict
+            A list of dicts, each containing a 'State' key and a 'Districts' key.
+        """
 
-    Returns
-    -------
-    list of str values
-    """
+        all_districts_list: list = []
 
-    driver = webDriver
+        state_element, list_of_states = self.scrape_state_list()
 
-    all_districts_list: list = []
+        # Allow webpage time to load initial dropdowns
+        time.sleep(3)
 
-    state_element, list_of_states = scrape_state_list()
+        try:
+            for state in list_of_states:
+                state_element.select_by_visible_text(state)
 
-    # Allow webpage time to load initial dropdowns
-    time.sleep(3)
+                # Wait for district dropdown to populate
+                time.sleep(2)
 
-    try:
-        for state in list_of_states:
-            state_element.select_by_visible_text(state)
-
-            # Wait for district dropdown to populate
-            time.sleep(2)
-
-            try:
-                district_dropdown = Select(
-                    driver.find_element(
-                        By.XPATH,
-                        "//label[normalize-space()='District']/following::select[1]",
+                try:
+                    district_dropdown = Select(
+                        self.driver.find_element(
+                            By.XPATH,
+                            "//label[normalize-space()='District']/following::select[1]",
+                        )
                     )
+
+                except Exception as e:
+                    logging.error("Unable to locate data by provided element type.")
+                    raise
+
+                districts_temp = get_dropdown_options(district_dropdown._el)
+
+                all_districts_list.append(
+                    {
+                        "State": state,
+                        "Districts": districts_temp,
+                    }
                 )
 
-            except Exception as e:
-                logging.error(f"Unable to locate data by provided element type.")
+        except Exception as e:
+            logging.error(f"Unable to extract district data for state: {state}.")
+            raise
 
-            districts_temp = get_dropdown_options(district_dropdown._el)
-
-            all_districts_list.append(
-                {
-                    "State": state,
-                    "Districts": districts_temp,
-                }
-            )
-
-    except Exception as e:
-        logging.error(f"Unable to extract district data for state: {state}.")
-
-    return all_districts_list
+        return all_districts_list
 
 
 def main():
-    scrape_state_list()
-    scrape_district_list()
+    Scraper = Navigator(webDriver)
+    all_districts = Scraper.scrape_district_list()
+
+    return all_districts
 
 
 if __name__ == "__main__":
