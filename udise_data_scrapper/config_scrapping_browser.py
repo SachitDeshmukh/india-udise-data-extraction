@@ -42,6 +42,7 @@ def start_driver(url: str):
         # Disable Chrome push notifications and Google Cloud Messaging (GCM)
         options.add_argument("--disable-notifications")
         options.add_argument("--disable-gcm")
+        options.add_argument("--log-level=3")
 
         # Launch the Chrome browser controlled by Selenium
         driver = webdriver.Chrome(options=options)

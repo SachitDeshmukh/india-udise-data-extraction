@@ -45,14 +45,14 @@ def get_dropdown_options(select_element):
 
         valid_options = [o.text for o in options if o.text.strip() != "Select"]
         logging.info(
-            f"Found {len(valid_options)} options for WebElement: {select_element} on website: {source_url}"
+            f"Found {len(valid_options)} options for current WebElement on website: {source_url}"
         )
 
         return valid_options
 
     except Exception as e:
         logging.error(
-            f"Options not found for WebElement: {select_element} on website: {source_url}"
+            f"Options not found for current WebElement on website: {source_url} due to error: {e}"
         )
 
 
@@ -85,8 +85,60 @@ def scrape_state_list():
     return state_dropdown, state_list
 
 
+def scrape_district_list():
+    """
+    Scrapes the list of districts for each state on the "District" dropdown.
+
+    Returns
+    -------
+    list of str values
+    """
+
+    driver = webDriver
+
+    all_districts_list: list = []
+
+    state_element, list_of_states = scrape_state_list()
+
+    # Allow webpage time to load initial dropdowns
+    time.sleep(3)
+
+    try:
+        for state in list_of_states:
+            state_element.select_by_visible_text(state)
+
+            # Wait for district dropdown to populate
+            time.sleep(2)
+
+            try:
+                district_dropdown = Select(
+                    driver.find_element(
+                        By.XPATH,
+                        "//label[normalize-space()='District']/following::select[1]",
+                    )
+                )
+
+            except Exception as e:
+                logging.error(f"Unable to locate data by provided element type.")
+
+            districts_temp = get_dropdown_options(district_dropdown._el)
+
+            all_districts_list.append(
+                {
+                    "State": state,
+                    "Districts": districts_temp,
+                }
+            )
+
+    except Exception as e:
+        logging.error(f"Unable to extract district data for state: {state}.")
+
+    return all_districts_list
+
+
 def main():
     scrape_state_list()
+    scrape_district_list()
 
 
 if __name__ == "__main__":
