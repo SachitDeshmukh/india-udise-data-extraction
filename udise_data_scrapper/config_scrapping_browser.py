@@ -39,6 +39,10 @@ def start_driver(url: str):
             "--headless"
         )  # "--headless" runs the browser without opening a visible window
 
+        # Disable Chrome push notifications and Google Cloud Messaging (GCM)
+        options.add_argument("--disable-notifications")
+        options.add_argument("--disable-gcm")
+
         # Launch the Chrome browser controlled by Selenium
         driver = webdriver.Chrome(options=options)
 
