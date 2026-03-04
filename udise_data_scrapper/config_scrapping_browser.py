@@ -5,8 +5,6 @@ import configuration
 # IMPORTING ALL NECESSARY MODULES
 
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select
 import logging  # Logging setup for monitoring execution
 
 # DEFINING GLOBALS
