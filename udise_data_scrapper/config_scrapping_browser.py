@@ -5,6 +5,9 @@ import configuration
 # IMPORTING ALL NECESSARY MODULES
 
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import logging  # Logging setup for monitoring execution
 
 # DEFINING GLOBALS
@@ -51,8 +54,40 @@ def start_driver(url: str):
         logging.error(f"Driver not initiated for url: {url} due to error: {e}")
 
 
+def click_advanced_search(driver):
+    """
+    Waits for the "Advance Search" button to load and clicks it to display the relevant filter elements.
+
+    Return
+    -------
+    None
+        Button click on the webpage
+    """
+
+    try:
+        wait = WebDriverWait(driver, 10)
+
+        advance_search_button = wait.until(
+            EC.presence_of_element_located((By.LINK_TEXT, "Advance Search"))
+        )
+
+        driver.execute_script(
+            "arguments[0].scrollIntoView({block:'center'});", advance_search_button
+        )
+
+        wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Advance Search")))
+
+        driver.execute_script("arguments[0].click();", advance_search_button)
+
+        logging.info(f"Advance Search button succesffuly clicked.")
+
+    except Exception as e:
+        logging.error(f"Advance Search button was not clicked due to error: {e}")
+
+
 def main():
-    start_driver(target_website_url)
+    driver = start_driver(target_website_url)
+    click_advanced_search(driver)
 
 
 if __name__ == "__main__":
