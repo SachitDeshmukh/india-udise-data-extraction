@@ -22,7 +22,7 @@ logging.basicConfig(
 )
 
 
-def get_dropdown_options(select_element):
+def get_dropdown_options(select_element, element_description: str):
     """
     Extracts all selectable values from a dropdown menu.
 
@@ -45,7 +45,7 @@ def get_dropdown_options(select_element):
 
         valid_options = [o.text for o in options if o.text.strip() != "Select"]
         logging.info(
-            f"Found {len(valid_options)} options for current WebElement on website: {source_url}"
+            f"Found {len(valid_options)} options for elememt: {element_description} on website: {source_url}"
         )
 
         return valid_options
@@ -96,10 +96,11 @@ class Navigator:
             )
 
         except Exception as e:
-            logging.error("Unable to locate data by provided element type.")
-            raise
+            logging.error(
+                f"Unable to locate data by provided element type due to error: {e}."
+            )
 
-        state_list = get_dropdown_options(state_dropdown._el)
+        state_list = get_dropdown_options(state_dropdown._el, "States")
 
         return state_dropdown, state_list
 
@@ -136,10 +137,13 @@ class Navigator:
                     )
 
                 except Exception as e:
-                    logging.error("Unable to locate data by provided element type.")
-                    raise
+                    logging.error(
+                        f"Unable to locate data by provided element type due to error: {e}."
+                    )
 
-                districts_temp = get_dropdown_options(district_dropdown._el)
+                districts_temp = get_dropdown_options(
+                    district_dropdown._el, f"Districts for state: {state}"
+                )
 
                 all_districts_list.append(
                     {
@@ -150,7 +154,6 @@ class Navigator:
 
         except Exception as e:
             logging.error(f"Unable to extract district data for state: {state}.")
-            raise
 
         return all_districts_list
 
