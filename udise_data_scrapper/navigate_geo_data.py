@@ -11,11 +11,11 @@ from selenium.webdriver.support.ui import Select
 import time
 import logging
 import pandas as pd
+from joblib import Parallel, delayed  # Parallel execution for simulations
 
 # DEFINING GLOBALS
 
 source_url = configuration.UDISE_URL
-webDriver = config_scrapping_browser.main()
 
 # Set logging format and level
 logging.basicConfig(
@@ -25,7 +25,7 @@ logging.basicConfig(
 
 def let_options_load():
     # Allow webpage time to load data of dropdowns
-    time.sleep(2)
+    time.sleep(1)
 
 
 def get_dropdown_options(select_element, element_description: str):
@@ -163,7 +163,9 @@ class Navigator:
                 )
 
         except Exception as e:
-            logging.error(f"Unable to extract district data for state: {state}.")
+            logging.error(
+                f"Unable to extract district data for state: {state} due to error: {e}."
+            )
 
         return all_districts_list
 
@@ -183,7 +185,7 @@ class Navigator:
                 f"Unable to locate data by provided element type due to error: {e}."
             )
 
-    def scrape_block_list(self):
+    def prep_block_scrapping(self):
         """
         Scrapes the list of block for each state-district pair on the "Block" dropdown.
 
@@ -192,9 +194,8 @@ class Navigator:
         list of dict
             A list of dicts, each containing a 'State' key, 'District' key, and 'Blocks' key.
         """
-        all_block_list = []
-
         state_district_list = self.scrape_district_list()
+
         state_district_dataframe = pd.DataFrame(state_district_list).explode(
             "Districts"
         )
@@ -202,39 +203,90 @@ class Navigator:
         # Converts the list of distictionaries into a pandas DataFrame with
         # column 1 for "State" values and column 2 for all "District" values
 
-        state_district_zip = zip(
-            state_district_dataframe["State"], state_district_dataframe["Districts"]
-        )  # Captures each row into a value pair that can be run through a loop.
+        state_district_pairs = state_district_dataframe.to_dict(
+            orient="records"
+        )  # Outputs a list of dictionary with each key-value pair of state-district
 
-        for state, district in state_district_zip:
+        district_chunks = configuration.DISTRICT_CHUNKS
 
-            self.state_dropdown.select_by_visible_text(state)
+        for i in range(0, len(state_district_pairs), district_chunks):
+            yield state_district_pairs[i : i + district_chunks]
+
+
+def parallel_scraping_block_list(districts_batch):
+
+    driver = config_scrapping_browser.main()  # create new headless driver
+
+    all_block_list = []
+
+    try:
+        for state_district_pair in districts_batch:
+
+            state = state_district_pair["State"]
+            district = state_district_pair["Districts"]
 
             let_options_load()
 
-            district_dropdown = self.search_district_dropdown()
+            state_dropdown = Select(
+                driver.find_element(
+                    By.XPATH,
+                    "//label[normalize-space()='State']/following::select[1]",
+                )
+            )
+
+            state_dropdown.select_by_visible_text(state)
+
+            let_options_load()
+
+            district_dropdown = Select(
+                driver.find_element(
+                    By.XPATH,
+                    "//label[normalize-space()='District']/following::select[1]",
+                )
+            )
+
             district_dropdown.select_by_visible_text(district)
 
             let_options_load()
 
-            block_dropdown = self.search_block_dropdown()
+            block_dropdown = Select(
+                driver.find_element(
+                    By.XPATH,
+                    "//label[normalize-space()='Block']/following::select[1]",
+                )
+            )
 
-            block_temp = get_dropdown_options(
-                block_dropdown._el, f"Block for district: {district} in state: {state}"
+            blocks = get_dropdown_options(
+                block_dropdown._el,
+                f"Blocks for district: {district} in state: {state}",
             )
 
             all_block_list.append(
-                {"State": state, "District": district, "Blocks": block_temp}
+                {"State": state, "District": district, "Blocks": blocks}
             )
 
         return all_block_list
 
+    finally:
+        driver.quit()
+
+
+def initializing_scraping():
+    webDriver = config_scrapping_browser.main()
+    Scraper = Navigator(webDriver)
+    STATE_DISTRICT_PAIR_BATCHES = list(Scraper.prep_block_scrapping())
+    Scraper.driver.quit()  # Close the headless broswer after obtaining frist level data
+
+    all_blocks_data = Parallel(n_jobs=configuration.PARALLEL_JOBS, backend="loky")(
+        delayed(parallel_scraping_block_list)(districts_batch)
+        for districts_batch in STATE_DISTRICT_PAIR_BATCHES
+    )
+
+    return all_blocks_data
+
 
 def main():
-    Scraper = Navigator(webDriver)
-    all_blocks = Scraper.scrape_block_list()  # TODO: covert this to parallel processing
-
-    return all_blocks
+    initializing_scraping()
 
 
 if __name__ == "__main__":

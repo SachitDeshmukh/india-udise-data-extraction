@@ -1,3 +1,5 @@
 # NOTING ALL CONFIG SETTING HERE
 
 UDISE_URL = "https://kys.udiseplus.gov.in"
+DISTRICT_CHUNKS = 100
+PARALLEL_JOBS = 6
