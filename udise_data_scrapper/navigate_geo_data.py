@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 import time
 import logging
+import pandas as pd
 
 # DEFINING GLOBALS
 
@@ -180,12 +181,58 @@ class Navigator:
                 f"Unable to locate data by provided element type due to error: {e}."
             )
 
+    def scrape_block_list(self):
+        """
+        Scrapes the list of block for each state-district pair on the "Block" dropdown.
+
+        Returns
+        -------
+        list of dict
+            A list of dicts, each containing a 'State' key, 'District' key, and 'Blocks' key.
+        """
+        all_block_list = []
+
+        state_district_list = self.scrape_district_list()
+        state_district_dataframe = pd.DataFrame(state_district_list).explode(
+            "Districts"
+        )
+
+        # Converts the list of distictionaries into a pandas DataFrame with
+        # column 1 for "State" values and column 2 for all "District" values
+
+        state_district_zip = zip(
+            state_district_dataframe["State"], state_district_dataframe["Districts"]
+        )  # Captures each row into a value pair that can be run through a loop.
+
+        for state, district in state_district_zip:
+
+            self.state_dropdown.select_by_visible_text(state)
+
+            time.sleep(2)  # Wait for district dropdown to populate
+
+            district_dropdown = self.search_district_dropdown()
+            district_dropdown.select_by_visible_text(district)
+
+            time.sleep(2)  # Wait for block dropdown to populate
+
+            block_dropdown = self.search_block_dropdown()
+
+            block_temp = get_dropdown_options(
+                block_dropdown._el, f"Block for district: {district} in state: {state}"
+            )
+
+            all_block_list.append(
+                {"State": state, "District": district, "Blocks": block_temp}
+            )
+
+        return all_block_list
+
 
 def main():
     Scraper = Navigator(webDriver)
-    all_districts = Scraper.scrape_district_list()
+    all_blocks = Scraper.scrape_block_list()  # TODO: covert this to parallel processing
 
-    return all_districts
+    return all_blocks
 
 
 if __name__ == "__main__":
