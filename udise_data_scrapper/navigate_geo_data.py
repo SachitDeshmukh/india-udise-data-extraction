@@ -23,6 +23,11 @@ logging.basicConfig(
 )
 
 
+def let_options_load():
+    # Allow webpage time to load data of dropdowns
+    time.sleep(2)
+
+
 def get_dropdown_options(select_element, element_description: str):
     """
     Extracts all selectable values from a dropdown menu.
@@ -86,8 +91,7 @@ class Navigator:
             The state dropdown element and a list of state names.
         """
 
-        # Allow webpage time to load initial dropdowns
-        time.sleep(3)
+        let_options_load()
 
         try:
             state_dropdown = Select(
@@ -137,15 +141,13 @@ class Navigator:
 
         list_of_states = self.scrape_state_list()
 
-        # Allow webpage time to load initial dropdowns
-        time.sleep(3)
+        let_options_load()
 
         try:
             for state in list_of_states:
                 self.state_dropdown.select_by_visible_text(state)
 
-                # Wait for district dropdown to populate
-                time.sleep(2)
+                let_options_load()
 
                 district_dropdown = self.search_district_dropdown()
 
@@ -208,12 +210,12 @@ class Navigator:
 
             self.state_dropdown.select_by_visible_text(state)
 
-            time.sleep(2)  # Wait for district dropdown to populate
+            let_options_load()
 
             district_dropdown = self.search_district_dropdown()
             district_dropdown.select_by_visible_text(district)
 
-            time.sleep(2)  # Wait for block dropdown to populate
+            let_options_load()
 
             block_dropdown = self.search_block_dropdown()
 
