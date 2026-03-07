@@ -164,6 +164,22 @@ class Navigator:
 
         return all_districts_list
 
+    def search_block_dropdown(self):
+        try:
+            block_dropdown = Select(
+                self.driver.find_element(
+                    By.XPATH,
+                    "//label[normalize-space()='Block']/following::select[1]",
+                )
+            )
+
+            return block_dropdown
+
+        except Exception as e:
+            logging.error(
+                f"Unable to locate data by provided element type due to error: {e}."
+            )
+
 
 def main():
     Scraper = Navigator(webDriver)
