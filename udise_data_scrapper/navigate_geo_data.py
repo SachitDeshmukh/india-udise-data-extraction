@@ -95,6 +95,8 @@ class Navigator:
                 )
             )
 
+            self.state_dropdown = state_dropdown  # Allowing to use this across the code
+
         except Exception as e:
             logging.error(
                 f"Unable to locate data by provided element type due to error: {e}."
@@ -102,7 +104,23 @@ class Navigator:
 
         state_list = get_dropdown_options(state_dropdown._el, "States")
 
-        return state_dropdown, state_list
+        return state_list
+
+    def search_district_dropdown(self):
+        try:
+            district_dropdown = Select(
+                self.driver.find_element(
+                    By.XPATH,
+                    "//label[normalize-space()='District']/following::select[1]",
+                )
+            )
+
+            return district_dropdown
+
+        except Exception as e:
+            logging.error(
+                f"Unable to locate data by provided element type due to error: {e}."
+            )
 
     def scrape_district_list(self):
         """
@@ -116,30 +134,19 @@ class Navigator:
 
         all_districts_list: list = []
 
-        state_element, list_of_states = self.scrape_state_list()
+        list_of_states = self.scrape_state_list()
 
         # Allow webpage time to load initial dropdowns
         time.sleep(3)
 
         try:
             for state in list_of_states:
-                state_element.select_by_visible_text(state)
+                self.state_dropdown.select_by_visible_text(state)
 
                 # Wait for district dropdown to populate
                 time.sleep(2)
 
-                try:
-                    district_dropdown = Select(
-                        self.driver.find_element(
-                            By.XPATH,
-                            "//label[normalize-space()='District']/following::select[1]",
-                        )
-                    )
-
-                except Exception as e:
-                    logging.error(
-                        f"Unable to locate data by provided element type due to error: {e}."
-                    )
+                district_dropdown = self.search_district_dropdown()
 
                 districts_temp = get_dropdown_options(
                     district_dropdown._el, f"Districts for state: {state}"
