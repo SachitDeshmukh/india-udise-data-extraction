@@ -82,7 +82,7 @@ def get_district_ids(state_id_list: list) -> list:
     Makes an API call for each state ID to obtain the distirct IDs.
 
     Return
-        List of dictionaries of state-district IDs
+        List of dictionaries of state-district IDs.
     """
 
     state_district_data = []
@@ -108,6 +108,32 @@ def get_district_ids(state_id_list: list) -> list:
     return state_district_data
 
 
+def state_districts_urls(id_pair_list: list) -> list:
+    """
+    Created GET API call URLs for each state-district pair.
+
+    Return
+        List of str values for GET API calls.
+    """
+    all_call_urls = []
+
+    ID_pairs = id_pair_list
+    for pair_entry in ID_pairs:
+        stateID = pair_entry["stateID"]
+        districtID = pair_entry["districtID"]
+        temp_school_data_url = str(
+            BASE_URL
+            + f"search-school/by-region?stateId={stateID}&districtId={districtID}"
+        )
+        all_call_urls.append(temp_school_data_url)
+
+    # print(all_call_urls)
+
+    logging.info("All URLs for each state-district ID pair generated.")
+
+    return all_call_urls
+
+
 def main():
     """
     1. Define the first API GET call url
@@ -125,6 +151,11 @@ def main():
 
     # STEP 3
     ID_pair_data = get_district_ids(state_ids)
+
+    # STEP 4
+    api_call_urls = state_districts_urls(ID_pair_data)
+
+    return api_call_urls
 
 
 if __name__ == "__main__":
