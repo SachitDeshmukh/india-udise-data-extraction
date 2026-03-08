@@ -51,8 +51,6 @@ def obtain_school_data(url_batch: str) -> list:
                 # print(entry)
                 all_school_data.append(entry)
 
-            wait_for_next_url()
-
         logging.info(f"All school data for current URL batch has been extracted.")
 
     except Exception as e:
@@ -85,10 +83,12 @@ def main():
     # print(URL_BATCHES)
 
     # STEP 2
+    all_school_data_list = []
     parallel_output = Parallel(
         n_jobs=configuration.PARALLEL_JOBS, backend="multiprocessing"
     )(delayed(obtain_school_data)(url_batch) for url_batch in URL_BATCHES)
-    all_school_data_list = parallel_output[0]
+    for output in parallel_output:
+        all_school_data_list.extend(output)
 
     # print(all_school_data_list)
 
