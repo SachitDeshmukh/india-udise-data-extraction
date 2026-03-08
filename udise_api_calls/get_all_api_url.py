@@ -1,7 +1,7 @@
 # Importing all necessary libraries
 
 import requests
-import json
+import time
 import logging
 import configuration
 
@@ -13,6 +13,11 @@ logging.basicConfig(
 # Defining the GLOBALS
 
 BASE_URL: str = configuration.UDISE_API_BASE_URL
+API_RETRIES = configuration.API_RETRIES
+
+
+def wait_for_next_requests_session():
+    time.sleep(5)
 
 
 def check_call_status(httpResponse: requests.Response):
@@ -27,23 +32,32 @@ def check_call_status(httpResponse: requests.Response):
     )
 
 
-def make_get_call(target_url: str):
+def make_get_call(target_url: str, retries=API_RETRIES):
     """
     Makes GET API call.
     """
-    api_session = requests.session()  # Initiate the API session
+    for connection_attemp in range(retries):
+        try:
+            api_session = requests.session()  # Initiate the API session
+            call_response = api_session.get(url=target_url, timeout=(5, 15))
+            call_response.raise_for_status()
+            check_call_status(call_response)
 
-    try:
-        call_response = api_session.get(url=target_url)
-        call_response.raise_for_status()
-    except requests.exceptions.ConnectionError as e:
-        raise e
-    except requests.exceptions.HTTPError as e:
-        raise e
+            return call_response
 
-    check_call_status(call_response)
+        except requests.exceptions.ConnectTimeout:
+            logging.error(f"Timeout. Retry {connection_attemp+1}/{retries}")
+            wait_for_next_requests_session()
 
-    return call_response
+        except requests.exceptions.ConnectionError:
+            logging.error(f"Connection error. Retry {connection_attemp+1}/{retries}")
+            wait_for_next_requests_session()
+
+        except requests.exceptions.HTTPError:
+            logging.error(f"HTTP error. Retry {connection_attemp+1}/{retries}")
+            wait_for_next_requests_session()
+
+    raise Exception("API failed after retries")
 
 
 def get_state_ids(call_url: str) -> list:
