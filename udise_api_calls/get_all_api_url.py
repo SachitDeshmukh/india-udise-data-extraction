@@ -46,7 +46,7 @@ def make_get_call(target_url: str):
     return call_response
 
 
-def get_school_ids(call_url: str) -> list:
+def get_state_ids(call_url: str) -> list:
     """
     Makes API GET call and extracts schools IDs from JSON response.
 
@@ -91,7 +91,7 @@ def main():
     state_api_url = str(BASE_URL + state_api_url_addition)
 
     # STEP 2
-    state_ids = get_school_ids(state_api_url)
+    state_ids = get_state_ids(state_api_url)
 
 
 if __name__ == "__main__":
