@@ -11,7 +11,6 @@ logging.basicConfig(
 )
 
 # Defining the GLOBALS
-
 BASE_URL: str = configuration.UDISE_API_BASE_URL
 API_RETRIES = configuration.API_RETRIES
 
@@ -36,7 +35,7 @@ def make_get_call(target_url: str, retries=API_RETRIES):
     """
     Makes GET API call.
     """
-    for connection_attemp in range(retries):
+    for connection_attempt in range(retries):
         try:
             api_session = requests.session()  # Initiate the API session
             call_response = api_session.get(url=target_url, timeout=(5, 15))
@@ -46,15 +45,15 @@ def make_get_call(target_url: str, retries=API_RETRIES):
             return call_response
 
         except requests.exceptions.ConnectTimeout:
-            logging.error(f"Timeout. Retry {connection_attemp+1}/{retries}")
+            logging.error(f"Timeout. Retry {connection_attempt+1}/{retries}")
             wait_for_next_requests_session()
 
         except requests.exceptions.ConnectionError:
-            logging.error(f"Connection error. Retry {connection_attemp+1}/{retries}")
+            logging.error(f"Connection error. Retry {connection_attempt+1}/{retries}")
             wait_for_next_requests_session()
 
         except requests.exceptions.HTTPError:
-            logging.error(f"HTTP error. Retry {connection_attemp+1}/{retries}")
+            logging.error(f"HTTP error. Retry {connection_attempt+1}/{retries}")
             wait_for_next_requests_session()
 
     raise Exception("API failed after retries")

@@ -13,9 +13,6 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# Defining the GLOBALS
-API_URL_LIST = get_all_api_url.main()
-
 
 def wait_for_next_url():
     time.sleep(1)
@@ -82,19 +79,23 @@ def main():
     """
 
     # STEP 1
+    API_URL_LIST = get_all_api_url.main()
     URL_BATCHES = list(yield_url_batches(API_URL_LIST))
 
     # print(URL_BATCHES)
 
     # STEP 2
-    all_school_data_list = Parallel(
+    parallel_output = Parallel(
         n_jobs=configuration.PARALLEL_JOBS, backend="multiprocessing"
     )(delayed(obtain_school_data)(url_batch) for url_batch in URL_BATCHES)
+    all_school_data_list = parallel_output[0]
 
     # print(all_school_data_list)
 
     # STEP 3
     all_school_data = get_pandas_dataframe(all_school_data_list)
+
+    # print(all_school_data.head(10))
 
     return all_school_data
 
