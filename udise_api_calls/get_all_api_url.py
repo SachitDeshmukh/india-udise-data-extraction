@@ -77,13 +77,43 @@ def get_state_ids(call_url: str) -> list:
     return all_state_ids
 
 
+def get_district_ids(state_id_list: list) -> list:
+    """
+    Makes an API call for each state ID to obtain the distirct IDs.
+
+    Return
+        List of dictionaries of state-district IDs
+    """
+
+    state_district_data = []
+
+    state_IDs = state_id_list
+    for ID in state_IDs:
+        temp_district_url = str(BASE_URL + f"districts?stateId={ID}&yearId=0")
+        temp_json_output = make_get_call(target_url=temp_district_url)
+        temp_python_output = temp_json_output.json()
+
+        districts_data = temp_python_output["data"]
+
+        for district_data in districts_data:
+            temp_district_id = district_data["districtId"]
+            state_district_entry = {
+                "stateID": ID,
+                "districtID": temp_district_id,
+            }  # Avoiding the need to explore the list of disctionaries later on
+            state_district_data.append(state_district_entry)
+
+    # print(state_district_data)
+
+    return state_district_data
+
+
 def main():
     """
     1. Define the first API GET call url
     2. Place the API GET call for state Ids
-    3. Create state-wise API GET calls for all district Ids
-    4. Create state-district pairs of Ids
-    5. Prepare a list of API GET call urls for each state-district pair
+    3. Plase state-wise API GET calls for all district Ids
+    4. Prepare a list of API GET call urls for each state-district pair
     """
 
     # STEP 1
@@ -92,6 +122,9 @@ def main():
 
     # STEP 2
     state_ids = get_state_ids(state_api_url)
+
+    # STEP 3
+    ID_pair_data = get_district_ids(state_ids)
 
 
 if __name__ == "__main__":
