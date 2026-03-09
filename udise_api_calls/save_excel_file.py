@@ -16,7 +16,7 @@ logging.basicConfig(
 
 # Defining GLOBALS
 FILE_NAME_BASE = configuration.EXCEL_FILE_BASE_TEXT
-OUTPUT_DIR = r"C:\Users\Sachit Deshmukh\Documents\Python Scripts\JPAL_MGS_Prefill_Automation\outputs"
+OUTPUT_DIR = r"C:\Users\Sachit Deshmukh\Documents\Python Scripts\JPAL_UDISE_DATA_EXTRACTION\outputs"
 
 
 def save_data_to_file(data: pd.DataFrame):
