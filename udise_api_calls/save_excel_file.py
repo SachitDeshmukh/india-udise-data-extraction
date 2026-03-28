@@ -13,6 +13,7 @@ FILE_NAME_BASE = configuration.EXCEL_FILE_BASE_TEXT
 OUTPUT_DIR = r"C:\Users\Sachit Deshmukh\Documents\Python Scripts\JPAL_UDISE_DATA_EXTRACTION\outputs"
 LOGGER = init_logger.main(__name__)
 
+
 def save_data_to_file(data: pd.DataFrame):
     version_date = str(f"{datetime.now().strftime('%Y-%m-%d')}")
     version_time = str(f"{datetime.now().strftime("%H-%M-%S")}")
@@ -35,8 +36,8 @@ def main():
 
 
 if __name__ == "__main__":
-    LOGGER.info(f"Running the code: {__file__}") # FOR DOCUMENTATION
-    LOGGER.debug(f"Running the code: {__file__}") # FOR DOCUMENTATION
+    LOGGER.info(f"Running the code: {__file__}")  # FOR DOCUMENTATION
+    LOGGER.debug(f"Running the code: {__file__}")  # FOR DOCUMENTATION
 
     main()
 

@@ -10,6 +10,7 @@ BASE_URL: str = configuration.UDISE_API_BASE_URL
 API_RETRIES = configuration.API_RETRIES
 LOGGER = init_logger.main(__name__)
 
+
 def wait_for_next_requests_session():
     time.sleep(5)
 
@@ -40,7 +41,9 @@ def make_get_call(target_url: str, retries=API_RETRIES):
             return call_response
 
         except requests.exceptions.ConnectTimeout:
-            LOGGER.warning(f"Connection timeout. Retry {connection_attempt+1}/{retries}")
+            LOGGER.warning(
+                f"Connection timeout. Retry {connection_attempt+1}/{retries}"
+            )
             wait_for_next_requests_session()
 
         except requests.exceptions.ReadTimeout:
@@ -171,8 +174,8 @@ def main():
 
 
 if __name__ == "__main__":
-    LOGGER.info(f"Running the code: {__file__}") # FOR DOCUMENTATION
-    LOGGER.debug(f"Running the code: {__file__}") # FOR DOCUMENTATION
+    LOGGER.info(f"Running the code: {__file__}")  # FOR DOCUMENTATION
+    LOGGER.debug(f"Running the code: {__file__}")  # FOR DOCUMENTATION
 
     main()
 

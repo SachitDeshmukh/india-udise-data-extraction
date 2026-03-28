@@ -7,6 +7,7 @@ import configuration
 import get_all_api_url
 import time
 
+
 def wait_for_next_url():
     time.sleep(1)
 
@@ -97,8 +98,8 @@ def main():
 
 if __name__ == "__main__":
     LOGGER = init_logger.main(__name__)
-    LOGGER.info(f"Running the code: {__file__}") # FOR DOCUMENTATION
-    LOGGER.debug(f"Running the code: {__file__}") # FOR DOCUMENTATION
+    LOGGER.info(f"Running the code: {__file__}")  # FOR DOCUMENTATION
+    LOGGER.debug(f"Running the code: {__file__}")  # FOR DOCUMENTATION
 
     main()
 
