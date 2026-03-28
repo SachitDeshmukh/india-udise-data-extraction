@@ -11,3 +11,6 @@ joblib==1.5.3
 
 # Requests library for API calls
 requests==2.32.5
+
+# Custom packages in the current repository
+-e .
