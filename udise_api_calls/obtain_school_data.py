@@ -1,18 +1,11 @@
 # Importing all necessary libraries
 
-import json
 import pandas as pd
 from joblib import Parallel, delayed
-import logging
+import init_logger
 import configuration
 import get_all_api_url
 import time
-
-# Set logging format and level
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
 
 def wait_for_next_url():
     time.sleep(1)
@@ -33,6 +26,8 @@ def obtain_school_data(url_batch: str) -> list:
     Return
         List of all school level data.
     """
+    # SET UP LOGGING
+    LOGGER = init_logger.main(__name__)
 
     all_school_data = []
 
@@ -51,10 +46,10 @@ def obtain_school_data(url_batch: str) -> list:
                 # print(entry)
                 all_school_data.append(entry)
 
-        logging.info(f"All school data for current URL batch has been extracted.")
+        LOGGER.info(f"All school data for current URL batch has been extracted.")
 
     except Exception as e:
-        logging.error(f"No school data found for this url: {url} due to error: {e}")
+        LOGGER.debug(f"No school data found for this url: {url} due to error: {e}")
 
     finally:
         return all_school_data
@@ -101,4 +96,11 @@ def main():
 
 
 if __name__ == "__main__":
+    LOGGER = init_logger.main(__name__)
+    LOGGER.info(f"Running the code: {__file__}") # FOR DOCUMENTATION
+    LOGGER.debug(f"Running the code: {__file__}") # FOR DOCUMENTATION
+
     main()
+
+    LOGGER.info("Run complete.")
+    LOGGER.debug("Run complete.")
