@@ -4,3 +4,4 @@
 backend_resources
 **/outputs
 venv
+logs/

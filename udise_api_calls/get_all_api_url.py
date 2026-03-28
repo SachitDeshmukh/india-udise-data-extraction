@@ -2,33 +2,28 @@
 
 import requests
 import time
-import logging
+import init_logger
 import configuration
-
-# Set logging format and level
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
 
 # Defining the GLOBALS
 BASE_URL: str = configuration.UDISE_API_BASE_URL
 API_RETRIES = configuration.API_RETRIES
-
+LOGGER = init_logger.main(__name__)
 
 def wait_for_next_requests_session():
     time.sleep(5)
 
 
-def check_call_status(httpResponse: requests.Response):
-    request_url = httpResponse.url
-    request_message = httpResponse.json()
-    (
-        logging.info(
-            f"Request status: {request_message["status"]} for Request: {request_url}"
-        )
-        if httpResponse.status_code == 200
-        else logging.info(httpResponse)
-    )
+# def check_call_status(httpResponse: requests.Response):
+#     request_url = httpResponse.url
+#     request_message = httpResponse.json()
+#     (
+#         LOGGER.info(
+#             f"Request status: {request_message["status"]} for Request: {request_url}"
+#         )
+#         if httpResponse.status_code == 200
+#         else LOGGER.info(httpResponse)
+#     )
 
 
 def make_get_call(target_url: str, retries=API_RETRIES):
@@ -38,22 +33,26 @@ def make_get_call(target_url: str, retries=API_RETRIES):
     for connection_attempt in range(retries):
         try:
             api_session = requests.session()  # Initiate the API session
-            call_response = api_session.get(url=target_url, timeout=(5, 15))
+            call_response = api_session.get(url=target_url, timeout=(15))
             call_response.raise_for_status()
-            check_call_status(call_response)
+            # check_call_status(call_response)
 
             return call_response
 
         except requests.exceptions.ConnectTimeout:
-            logging.error(f"Timeout. Retry {connection_attempt+1}/{retries}")
+            LOGGER.warning(f"Connection timeout. Retry {connection_attempt+1}/{retries}")
+            wait_for_next_requests_session()
+
+        except requests.exceptions.ReadTimeout:
+            LOGGER.warning(f"Read timeout. Retry {connection_attempt+1}/{retries}")
             wait_for_next_requests_session()
 
         except requests.exceptions.ConnectionError:
-            logging.error(f"Connection error. Retry {connection_attempt+1}/{retries}")
+            LOGGER.warning(f"Connection error. Retry {connection_attempt+1}/{retries}")
             wait_for_next_requests_session()
 
         except requests.exceptions.HTTPError:
-            logging.error(f"HTTP error. Retry {connection_attempt+1}/{retries}")
+            LOGGER.warning(f"HTTP error. Retry {connection_attempt+1}/{retries}")
             wait_for_next_requests_session()
 
     raise Exception("API failed after retries")
@@ -83,8 +82,8 @@ def get_state_ids(call_url: str) -> list:
 
     # print(all_state_ids)
 
-    logging.info(
-        f"State ID data from API call response for url: {call_url} successfully extracted"
+    LOGGER.info(
+        f"State ID data successfully extracted."
     )
 
     return all_state_ids
@@ -118,6 +117,10 @@ def get_district_ids(state_id_list: list) -> list:
 
     # print(state_district_data)
 
+    LOGGER.info(
+        f"All district IDs successfully extracted."
+    )
+
     return state_district_data
 
 
@@ -142,7 +145,7 @@ def state_districts_urls(id_pair_list: list) -> list:
 
     # print(all_call_urls)
 
-    logging.info("All URLs for each state-district ID pair generated.")
+    LOGGER.info("All URLs for each state-district ID pair generated.")
 
     return all_call_urls
 
@@ -172,4 +175,10 @@ def main():
 
 
 if __name__ == "__main__":
+    LOGGER.info(f"Running the code: {__file__}") # FOR DOCUMENTATION
+    LOGGER.debug(f"Running the code: {__file__}") # FOR DOCUMENTATION
+
     main()
+
+    LOGGER.info(f"Run complete.")
+    LOGGER.debug(f"Run complete.")
