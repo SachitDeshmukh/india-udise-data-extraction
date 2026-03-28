@@ -2,14 +2,14 @@
 
 import pandas as pd
 from datetime import datetime
-import init_logger
 
-import configuration
-import obtain_school_data
+from udise_api_calls import init_logger
+from udise_api_calls import configuration as api_config
+from udise_api_calls import obtain_school_data
 
 
 # Defining GLOBALS
-FILE_NAME_BASE = configuration.EXCEL_FILE_BASE_TEXT
+FILE_NAME_BASE = api_config.EXCEL_FILE_BASE_TEXT
 OUTPUT_DIR = r"C:\Users\Sachit Deshmukh\Documents\Python Scripts\JPAL_UDISE_DATA_EXTRACTION\outputs"
 LOGGER = init_logger.main(__name__)
 

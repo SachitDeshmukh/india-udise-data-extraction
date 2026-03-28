@@ -2,12 +2,12 @@
 
 import requests
 import time
-import init_logger
-import configuration
+from udise_api_calls import init_logger
+from udise_api_calls import configuration as api_config
 
 # Defining the GLOBALS
-BASE_URL: str = configuration.UDISE_API_BASE_URL
-API_RETRIES = configuration.API_RETRIES
+BASE_URL: str = api_config.UDISE_API_BASE_URL
+API_RETRIES = api_config.API_RETRIES
 LOGGER = init_logger.main(__name__)
 
 

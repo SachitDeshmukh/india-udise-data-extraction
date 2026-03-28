@@ -2,9 +2,9 @@
 
 import pandas as pd
 from joblib import Parallel, delayed
-import init_logger
-import configuration
-import get_all_api_url
+from udise_api_calls import init_logger
+from udise_api_calls import configuration as api_config
+from udise_api_calls import get_all_api_url
 import time
 
 
@@ -13,7 +13,7 @@ def wait_for_next_url():
 
 
 def yield_url_batches(url_list: list):
-    url_chunks = configuration.URL_CHUNKS
+    url_chunks = api_config.URL_CHUNKS
     url_list = url_list
 
     for i in range(0, len(url_list), url_chunks):
@@ -81,7 +81,7 @@ def main():
     # STEP 2
     all_school_data_list = []
     parallel_output = Parallel(
-        n_jobs=configuration.PARALLEL_JOBS, backend="multiprocessing"
+        n_jobs=api_config.PARALLEL_JOBS, backend="multiprocessing"
     )(delayed(obtain_school_data)(url_batch) for url_batch in URL_BATCHES)
     for output in parallel_output:
         all_school_data_list.extend(output)
