@@ -40,5 +40,5 @@ if __name__ == "__main__":
 
     main()
 
-    LOGGER.info(f"Run complete.")
-    LOGGER.debug(f"Run complete.")
+    LOGGER.info("Run complete.")
+    LOGGER.debug("Run complete.")

@@ -82,9 +82,7 @@ def get_state_ids(call_url: str) -> list:
 
     # print(all_state_ids)
 
-    LOGGER.info(
-        f"State ID data successfully extracted."
-    )
+    LOGGER.info("State ID data successfully extracted.")
 
     return all_state_ids
 
@@ -117,9 +115,7 @@ def get_district_ids(state_id_list: list) -> list:
 
     # print(state_district_data)
 
-    LOGGER.info(
-        f"All district IDs successfully extracted."
-    )
+    LOGGER.info("All district IDs successfully extracted.")
 
     return state_district_data
 
@@ -180,5 +176,5 @@ if __name__ == "__main__":
 
     main()
 
-    LOGGER.info(f"Run complete.")
-    LOGGER.debug(f"Run complete.")
+    LOGGER.info("Run complete.")
+    LOGGER.debug("Run complete.")
