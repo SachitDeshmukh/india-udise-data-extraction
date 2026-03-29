@@ -3,6 +3,7 @@ THIS FILE WILL RETURN DATAFRAME OF INITIAL API RESPONSES FOR SELECT STATE AND DI
 """
 
 # IMPORTING NECESSARY LIBRARIES
+import pandas as pd
 import udise_api_calls.get_all_api_url as api_url  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
 import udise_api_calls.init_logger as def_log  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
 import udise_api_calls.obtain_school_data as scl_data  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
@@ -50,16 +51,16 @@ def get_urls(id_pairs: list) -> list:
     return url_list
 
 
-def obtain_school_data(url_list: list) -> list:
+def obtain_school_data(url_list: list) -> pd.DataFrame:
     raw_school_data = scl_data.obtain_school_data(url_list)
-    raw_school_data = scl_data.get_pandas_dataframe(
+    raw_dataframe = scl_data.get_pandas_dataframe(
         raw_school_data
     )  # Prints the dataframe shape
 
-    return raw_school_data
+    return raw_dataframe
 
 
-def main():
+def main() -> pd.DataFrame:
     """
     Obtain daraframe of raw school level data for select state-district combinations.
 
@@ -74,6 +75,10 @@ def main():
     URL_LIST = get_urls(ID_PAIRS)
 
     RAW_DATA = obtain_school_data(URL_LIST)
+
+    # RAW_DATA.to_csv(
+    #     r"C:\Users\Sachit Deshmukh\Documents\Python Scripts\JPAL_UDISE_DATA_EXTRACTION\outputs\temp.csv"
+    # )
 
     return RAW_DATA
 
