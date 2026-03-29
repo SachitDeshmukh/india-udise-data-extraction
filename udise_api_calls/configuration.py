@@ -5,6 +5,7 @@ LOGS_PATH = (
 
 UDISE_API_BASE_URL = "https://kys.udiseplus.gov.in/webapp/api/"
 API_RETRIES = 5
+API_TIMEOUT = 15  # 15 SECONDS
 URL_CHUNKS = 100
 API_THREADS = 20
 PARALLEL_JOBS = 6

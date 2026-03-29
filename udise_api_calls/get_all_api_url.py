@@ -1,62 +1,52 @@
 # Importing all necessary libraries
 
-import requests
-import time
+import aiohttp
+import asyncio
 from udise_api_calls import init_logger
 from udise_api_calls import configuration as api_config
 
 # Defining the GLOBALS
 BASE_URL: str = api_config.UDISE_API_BASE_URL
 API_RETRIES = api_config.API_RETRIES
+API_TIMEOUT = api_config.API_TIMEOUT
 LOGGER = init_logger.main(__name__)
 
 
 def wait_for_next_requests_session():
-    time.sleep(5)
+    asyncio.sleep(5)
 
 
-# def check_call_status(httpResponse: requests.Response):
-#     request_url = httpResponse.url
-#     request_message = httpResponse.json()
-#     (
-#         LOGGER.info(
-#             f"Request status: {request_message["status"]} for Request: {request_url}"
-#         )
-#         if httpResponse.status_code == 200
-#         else LOGGER.info(httpResponse)
-#     )
-
-
-def make_get_call(target_url: str, retries=API_RETRIES):
+async def make_get_call(target_url: str, retries=API_RETRIES):
     """
-    Makes GET API call.
+    Makes async GET API call.
     """
     for connection_attempt in range(retries):
         try:
-            api_session = requests.session()  # Initiate the API session
-            call_response = api_session.get(url=target_url, timeout=(15))
-            call_response.raise_for_status()
-            # check_call_status(call_response)
+            async with aiohttp.ClientSession() as api_session:
+                async with api_session.get(
+                    url=target_url, timeout=aiohttp.ClientTimeout(total=API_TIMEOUT)
+                ) as call_response:
+                    call_response.raise_for_status()
+                    json_data = await call_response.json()
+                    return json_data
 
-            return call_response
-
-        except requests.exceptions.ConnectTimeout:
+        except aiohttp.ServerTimeoutError:
             LOGGER.warning(
                 f"Connection timeout. Retry {connection_attempt+1}/{retries}"
             )
-            wait_for_next_requests_session()
+            await asyncio.sleep(...)  # replace time.sleep() with this
 
-        except requests.exceptions.ReadTimeout:
+        except asyncio.TimeoutError:
             LOGGER.warning(f"Read timeout. Retry {connection_attempt+1}/{retries}")
-            wait_for_next_requests_session()
+            await asyncio.sleep(...)
 
-        except requests.exceptions.ConnectionError:
+        except aiohttp.ClientConnectionError:
             LOGGER.warning(f"Connection error. Retry {connection_attempt+1}/{retries}")
-            wait_for_next_requests_session()
+            await asyncio.sleep(...)
 
-        except requests.exceptions.HTTPError:
+        except aiohttp.ClientResponseError:
             LOGGER.warning(f"HTTP error. Retry {connection_attempt+1}/{retries}")
-            wait_for_next_requests_session()
+            await asyncio.sleep(...)
 
     raise Exception("API failed after retries")
 
@@ -68,12 +58,7 @@ def get_state_ids(call_url: str) -> list:
     Returns:
         List of school IDs to iter over.
     """
-    json_output = make_get_call(target_url=call_url)
-    python_output = json_output.json()
-    # Obtained request output data in Python disctionary format
-
-    # state_data_formatted = json.dumps(python_output, indent=4)
-    # print(state_data_formatted)
+    python_output = asyncio.run(make_get_call(target_url=call_url))
 
     states_data: list = python_output["data"]  # List of states data dictionaries
 
@@ -103,8 +88,7 @@ def get_district_ids(state_id_list: list) -> list:
     state_IDs = state_id_list
     for ID in state_IDs:
         temp_district_url = str(BASE_URL + f"districts?stateId={ID}&yearId=0")
-        temp_json_output = make_get_call(target_url=temp_district_url)
-        temp_python_output = temp_json_output.json()
+        temp_python_output = asyncio.run(make_get_call(target_url=temp_district_url))
 
         districts_data = temp_python_output["data"]
 

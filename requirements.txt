@@ -8,6 +8,7 @@ pandas==2.2.3
 
 # Parallel processing
 joblib==1.5.3
+aiohttp==3.13.4
 
 # Requests library for API calls
 requests==2.32.5
