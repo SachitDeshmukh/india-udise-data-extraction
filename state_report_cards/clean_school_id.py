@@ -4,7 +4,6 @@ THIS FILE WILL RETURN LIST OF SCHOOL IDS FOR RELEVANT SCHOOLS FOR MATH GAMES SCA
 
 # IMPORTING NECESSARY LIBRARIES
 import pandas as pd
-import numpy as np
 import udise_api_calls.init_logger as def_log  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
 import state_report_cards.state_school_data as report_raw
 from state_report_cards import configuration as report_config
