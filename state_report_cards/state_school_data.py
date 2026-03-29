@@ -60,6 +60,7 @@ def obtain_school_data(url_list: list) -> pd.DataFrame:
     return raw_dataframe
 
 
+@def_log.log_documentation_decorator
 def main() -> pd.DataFrame:
     """
     Obtain daraframe of raw school level data for select state-district combinations.
@@ -84,10 +85,4 @@ def main() -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    LOGGER.info(f"Running the code: {__file__}")  # FOR DOCUMENTATION
-    LOGGER.debug(f"Running the code: {__file__}")  # FOR DOCUMENTATION
-
     main()
-
-    LOGGER.info("Run complete.")
-    LOGGER.debug("Run complete.")

@@ -3,6 +3,8 @@
 # Importing all necessary libraries
 
 import logging
+from functools import wraps
+import inspect
 from udise_api_calls import configuration as api_config
 
 
@@ -51,6 +53,25 @@ def main(module_name):
     logger.addHandler(console_handler)
 
     return logger
+
+
+def log_documentation_decorator(function):
+
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        LOGGER = logging.getLogger(function.__module__)
+        source_file = inspect.getsourcefile(function)
+        LOGGER.info(f"Running the code: {source_file}")
+        LOGGER.debug(f"Running the code: {source_file}")
+
+        result = function(*args, **kwargs)
+
+        LOGGER.info("Run complete.")
+        LOGGER.debug("Run complete.")
+
+        return result
+
+    return wrapper
 
 
 if __name__ == "__main__":

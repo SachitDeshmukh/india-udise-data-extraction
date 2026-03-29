@@ -63,6 +63,7 @@ def obtain_school_ids(dataframe: pd.DataFrame) -> list:
     return school_ids
 
 
+@def_log.log_documentation_decorator
 def main(dataframe: pd.DataFrame) -> list:
     """
     Cleans the data and outputs the school IDs of relevant schools for Math Games.
@@ -92,14 +93,8 @@ def main(dataframe: pd.DataFrame) -> list:
 
 
 if __name__ == "__main__":
-    LOGGER.info(f"Running the code: {__file__}")  # FOR DOCUMENTATION
-    LOGGER.debug(f"Running the code: {__file__}")  # FOR DOCUMENTATION
-
     data: pd.DataFrame = (
         report_raw.main()
     )  # Ensures that the output from main() is a pandas DataFrame
 
     main(data)
-
-    LOGGER.info("Run complete.")
-    LOGGER.debug("Run complete.")
