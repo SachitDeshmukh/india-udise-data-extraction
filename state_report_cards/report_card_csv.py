@@ -59,7 +59,7 @@ def obtain_school_data(url_list: list, data_set) -> pd.DataFrame:
         for url_batch in url_batches
     )
     for output in parallel_output:
-        school_data_list.append(
+        school_data_list.extend(
             output
         )  # ENROLMENT DATA IS IN DICT FORMAT NOT LIST OF DICT
 

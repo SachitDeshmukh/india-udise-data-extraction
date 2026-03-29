@@ -149,6 +149,7 @@ def state_districts_urls(id_pair_list: list) -> list:
     return all_call_urls
 
 
+@init_logger.log_documentation_decorator
 def main():
     """
     1. Define the first API GET call url
@@ -174,10 +175,4 @@ def main():
 
 
 if __name__ == "__main__":
-    LOGGER.info(f"Running the code: {__file__}")  # FOR DOCUMENTATION
-    LOGGER.debug(f"Running the code: {__file__}")  # FOR DOCUMENTATION
-
     main()
-
-    LOGGER.info("Run complete.")
-    LOGGER.debug("Run complete.")

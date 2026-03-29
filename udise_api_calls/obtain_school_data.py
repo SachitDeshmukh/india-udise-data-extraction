@@ -1,6 +1,7 @@
 # Importing all necessary libraries
 
 import pandas as pd
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from joblib import Parallel, delayed
 from udise_api_calls import init_logger
 from udise_api_calls import configuration as api_config
@@ -40,32 +41,28 @@ def obtain_school_data(url_batch: str, data_set) -> list:
 
     all_school_data = []
 
-    url_list = url_batch
-
-    try:
-        for url in url_list:
+    def single_get_call(url):
+        try:
             json_output = get_all_api_url.make_get_call(url)
             python_output = json_output.json()
+            return python_output["data"][data_set]
+        except Exception as e:
+            LOGGER.debug(f"No school data found for url: {url} due to error: {e}")
 
-            # python_str = json.dumps(python_output, indent=2)
-            # print(python_str)
+    with ThreadPoolExecutor(max_workers=api_config.API_THREADS) as executor:
+        futures = {executor.submit(single_get_call, url): url for url in url_batch}
+        for future in as_completed(futures):
+            result = future.result()
+            if type(result) == list:
+                all_school_data.extend(result)  # WHEN CONTENT = LIST OF DICT
+            if type(result) == dict:
+                all_school_data.append(result)  # WHEN ENROLL_DATA = DICT
 
-            school_data_entries: list = python_output["data"][data_set]
-            for entry in school_data_entries:
-                # print(entry)
-                all_school_data.append(entry)
+    LOGGER.info(
+        f"[PID {worker_id}]: All school data for current URL batch has been extracted."
+    )
 
-        LOGGER.info(
-            f"[PID {worker_id}]: All school data for current URL batch has been extracted."
-        )
-
-    except Exception as e:
-        LOGGER.debug(
-            f"[PID {worker_id}]: No school data found for url: {url} due to error: {e}"
-        )
-
-    finally:
-        return all_school_data
+    return all_school_data
 
 
 def get_pandas_dataframe(data: list) -> pd.DataFrame:
@@ -77,6 +74,7 @@ def get_pandas_dataframe(data: list) -> pd.DataFrame:
     return final_data
 
 
+@init_logger.log_documentation_decorator
 def main():
     """
     1. Generate list of URL batches for parsing through parallel workers.
@@ -110,11 +108,4 @@ def main():
 
 
 if __name__ == "__main__":
-    LOGGER = init_logger.main(__name__)
-    LOGGER.info(f"Running the code: {__file__}")  # FOR DOCUMENTATION
-    LOGGER.debug(f"Running the code: {__file__}")  # FOR DOCUMENTATION
-
     main()
-
-    LOGGER.info("Run complete.")
-    LOGGER.debug("Run complete.")

@@ -30,16 +30,11 @@ def save_data_to_file(data: pd.DataFrame):
         LOGGER.debug(f"Data was not saved due to error: {e}")
 
 
+@init_logger.log_documentation_decorator
 def main():
     all_data = obtain_school_data.main()
     save_data_to_file(all_data)
 
 
 if __name__ == "__main__":
-    LOGGER.info(f"Running the code: {__file__}")  # FOR DOCUMENTATION
-    LOGGER.debug(f"Running the code: {__file__}")  # FOR DOCUMENTATION
-
     main()
-
-    LOGGER.info("Run complete.")
-    LOGGER.debug("Run complete.")
