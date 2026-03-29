@@ -6,6 +6,8 @@ from udise_api_calls import init_logger
 from udise_api_calls import configuration as api_config
 from udise_api_calls import get_all_api_url
 import time
+import logging
+import os
 
 
 def wait_for_next_url():
@@ -20,15 +22,21 @@ def yield_url_batches(url_list: list):
         yield url_list[i : i + url_chunks]
 
 
-def obtain_school_data(url_batch: str) -> list:
+def obtain_school_data(url_batch: str, data_set) -> list:
     """
     Obtain all school level data in dictionary format.
 
     Return
         List of all school level data.
     """
-    # SET UP LOGGING
-    LOGGER = init_logger.main(__name__)
+    # SET UP LOGGING - unique per worker process
+    worker_id = os.getpid()
+    logger_name = f"{__name__}.worker_{worker_id}"
+    LOGGER = logging.getLogger(logger_name)
+
+    # Prevent duplicate handlers if logger already exists on this process
+    if not LOGGER.handlers:
+        LOGGER = init_logger.main(logger_name)
 
     all_school_data = []
 
@@ -42,15 +50,19 @@ def obtain_school_data(url_batch: str) -> list:
             # python_str = json.dumps(python_output, indent=2)
             # print(python_str)
 
-            school_data_entries: list = python_output["data"]["content"]
+            school_data_entries: list = python_output["data"][data_set]
             for entry in school_data_entries:
                 # print(entry)
                 all_school_data.append(entry)
 
-        LOGGER.info(f"All school data for current URL batch has been extracted.")
+        LOGGER.info(
+            f"[PID {worker_id}]: All school data for current URL batch has been extracted."
+        )
 
     except Exception as e:
-        LOGGER.debug(f"No school data found for this url: {url} due to error: {e}")
+        LOGGER.debug(
+            f"[PID {worker_id}]: No school data found for url: {url} due to error: {e}"
+        )
 
     finally:
         return all_school_data
@@ -75,6 +87,7 @@ def main():
     # STEP 1
     API_URL_LIST = get_all_api_url.main()
     URL_BATCHES = list(yield_url_batches(API_URL_LIST))
+    DATA_SET = api_config.API_DATA_SET_LEVEL_1
 
     # print(URL_BATCHES)
 
@@ -82,7 +95,7 @@ def main():
     all_school_data_list = []
     parallel_output = Parallel(
         n_jobs=api_config.PARALLEL_JOBS, backend="multiprocessing"
-    )(delayed(obtain_school_data)(url_batch) for url_batch in URL_BATCHES)
+    )(delayed(obtain_school_data)(url_batch, DATA_SET) for url_batch in URL_BATCHES)
     for output in parallel_output:
         all_school_data_list.extend(output)
 

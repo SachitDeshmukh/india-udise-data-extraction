@@ -39,3 +39,6 @@ FILTER_SCHOOL_VALUES = {
         "Primary with Upper Primary",
     ],
 }
+
+# REPORT CARD CSV
+API_DATA_SET_LEVEL_2 = "schEnrollmentYearDataTotal"

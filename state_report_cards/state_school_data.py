@@ -7,10 +7,12 @@ import pandas as pd
 import udise_api_calls.get_all_api_url as api_url  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
 import udise_api_calls.init_logger as def_log  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
 import udise_api_calls.obtain_school_data as scl_data  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
+from udise_api_calls import configuration as api_config
 from state_report_cards import configuration as report_config
 
 # DEFINING THE GLOBALS
 LOGGER = def_log.main(__name__)
+DATA_SET = api_config.API_DATA_SET_LEVEL_1
 
 
 # DEFINING THE FUNCTIONS
@@ -51,8 +53,8 @@ def get_urls(id_pairs: list) -> list:
     return url_list
 
 
-def obtain_school_data(url_list: list) -> pd.DataFrame:
-    raw_school_data = scl_data.obtain_school_data(url_list)
+def obtain_school_data(url_list: list, data_set) -> pd.DataFrame:
+    raw_school_data = scl_data.obtain_school_data(url_list, data_set)
     raw_dataframe = scl_data.get_pandas_dataframe(
         raw_school_data
     )  # Prints the dataframe shape
@@ -75,7 +77,7 @@ def main() -> pd.DataFrame:
     ID_PAIRS = create_id_pairs(STATE_IDS, DISTRICT_IDS)
     URL_LIST = get_urls(ID_PAIRS)
 
-    RAW_DATA = obtain_school_data(URL_LIST)
+    RAW_DATA = obtain_school_data(URL_LIST, DATA_SET)
 
     # RAW_DATA.to_csv(
     #     r"C:\Users\Sachit Deshmukh\Documents\Python Scripts\JPAL_UDISE_DATA_EXTRACTION\outputs\temp.csv"
