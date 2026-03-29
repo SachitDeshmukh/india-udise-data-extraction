@@ -1,18 +1,13 @@
 # Importing all necessary libraries
 
 import pandas as pd
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import asyncio
 from joblib import Parallel, delayed
 from udise_api_calls import init_logger
 from udise_api_calls import configuration as api_config
 from udise_api_calls import get_all_api_url
-import time
 import logging
 import os
-
-
-def wait_for_next_url():
-    time.sleep(1)
 
 
 def yield_url_batches(url_list: list):
@@ -23,46 +18,65 @@ def yield_url_batches(url_list: list):
         yield url_list[i : i + url_chunks]
 
 
-def obtain_school_data(url_batch: str, data_set) -> list:
+async def single_get_call(url: str, data_set: str, logger: logging.Logger):
     """
-    Obtain all school level data in dictionary format.
+    Fetch and extract school data for a single URL.
+    """
+    try:
+        python_output = await get_all_api_url.make_get_call(url)
+        return python_output["data"][data_set]
+    except Exception as e:
+        logger.debug(f"No school data found for url: {url} due to error: {e}")
 
-    Return
-        List of all school level data.
+
+async def async_fire_api(url_batch: list, data_set: str) -> list:
+    """
+    Fire all URLs in a batch concurrently to obtain response from API calls.
     """
     # SET UP LOGGING - unique per worker process
     worker_id = os.getpid()
     logger_name = f"{__name__}.worker_{worker_id}"
     LOGGER = logging.getLogger(logger_name)
 
-    # Prevent duplicate handlers if logger already exists on this process
+    # PREVENT DUPLICATE PROCESSEES IF HANDDLER ALREADY EXITS
     if not LOGGER.handlers:
         LOGGER = init_logger.main(logger_name)
 
     all_school_data = []
 
-    def single_get_call(url):
-        try:
-            json_output = get_all_api_url.make_get_call(url)
-            python_output = json_output.json()
-            return python_output["data"][data_set]
-        except Exception as e:
-            LOGGER.debug(f"No school data found for url: {url} due to error: {e}")
+    semaphore = asyncio.Semaphore(
+        api_config.CALL_LIMIT
+    )  # limit the max no of concurrent calls per worker
 
-    with ThreadPoolExecutor(max_workers=api_config.API_THREADS) as executor:
-        futures = {executor.submit(single_get_call, url): url for url in url_batch}
-        for future in as_completed(futures):
-            result = future.result()
-            if type(result) == list:
-                all_school_data.extend(result)  # WHEN CONTENT = LIST OF DICT
-            if type(result) == dict:
-                all_school_data.append(result)  # WHEN ENROLL_DATA = DICT
+    async def limit_get_calls(url, data_set, LOGGER):
+        async with semaphore:  # blocks here if max limit of calls already in-flight
+            return await single_get_call(url, data_set, LOGGER)
+
+    tasks = [limit_get_calls(url, data_set, LOGGER) for url in url_batch]
+    results = await asyncio.gather(*tasks)  # all URLs fired concurrently
+
+    for result in results:
+        if type(result) == list:
+            all_school_data.extend(result)  # WHEN CONTENT = LIST OF DICT
+        if type(result) == dict:
+            all_school_data.append(result)  # WHEN ENROLL_DATA = DICT
 
     LOGGER.info(
-        f"[PID {worker_id}]: All school data for current URL batch has been extracted."
+        f"[PID {worker_id}] Batch complete. {len(all_school_data)} records extracted."
     )
-
     return all_school_data
+
+
+def obtain_school_data(url_batch: str, data_set) -> list:
+    """
+    Sync wrapper so joblib can call this from each worker process.
+    """
+    loop = asyncio.new_event_loop()  # create a brand new event loop
+    asyncio.set_event_loop(loop)  # set it as the current loop
+    try:
+        return loop.run_until_complete(async_fire_api(url_batch, data_set))
+    finally:
+        loop.close()  # clean up after batch is done
 
 
 def get_pandas_dataframe(data: list) -> pd.DataFrame:
@@ -108,4 +122,5 @@ def main():
 
 
 if __name__ == "__main__":
+    LOGGER = init_logger.main(__name__)
     main()

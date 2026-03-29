@@ -40,7 +40,6 @@ def report_card_urls(id_list: list) -> list:
     return all_call_urls
 
 
-# TODO: INTRODUCE ASYNCIO FOR ASYNCHRONUS EXECUTION OF CODE TO OPTIMIZE TIME COMPLEXITY
 def obtain_school_data(url_list: list, data_set) -> pd.DataFrame:
     """
     Extracts report card level data for batches of URL in parallel.

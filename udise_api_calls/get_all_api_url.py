@@ -12,8 +12,8 @@ API_TIMEOUT = api_config.API_TIMEOUT
 LOGGER = init_logger.main(__name__)
 
 
-def wait_for_next_requests_session():
-    asyncio.sleep(5)
+async def wait_for_attempt():
+    await asyncio.sleep(5)
 
 
 async def make_get_call(target_url: str, retries=API_RETRIES):
@@ -34,19 +34,19 @@ async def make_get_call(target_url: str, retries=API_RETRIES):
             LOGGER.warning(
                 f"Connection timeout. Retry {connection_attempt+1}/{retries}"
             )
-            await asyncio.sleep(...)  # replace time.sleep() with this
+            await wait_for_attempt()
 
         except asyncio.TimeoutError:
             LOGGER.warning(f"Read timeout. Retry {connection_attempt+1}/{retries}")
-            await asyncio.sleep(...)
+            await wait_for_attempt()
 
         except aiohttp.ClientConnectionError:
             LOGGER.warning(f"Connection error. Retry {connection_attempt+1}/{retries}")
-            await asyncio.sleep(...)
+            await wait_for_attempt()
 
         except aiohttp.ClientResponseError:
             LOGGER.warning(f"HTTP error. Retry {connection_attempt+1}/{retries}")
-            await asyncio.sleep(...)
+            await wait_for_attempt()
 
     raise Exception("API failed after retries")
 
