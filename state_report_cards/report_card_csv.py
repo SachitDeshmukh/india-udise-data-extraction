@@ -9,6 +9,7 @@ import state_report_cards.state_school_data as report_raw  # ENSURE INSTALLATION
 import state_report_cards.clean_school_id as clean_id  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
 import udise_api_calls.init_logger as def_log  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
 import udise_api_calls.obtain_school_data as scl_data  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
+import udise_api_calls.save_file as save_csv  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
 from udise_api_calls import configuration as api_config
 from state_report_cards import configuration as report_config
 
@@ -69,16 +70,15 @@ def obtain_school_data(url_list: list, data_set) -> pd.DataFrame:
     return report_card_raw
 
 
+def save_csv_file(data: pd.DataFrame):
+    save_csv.save_data_to_file(data)
+
+
 @def_log.log_documentation_decorator
 def main(id_list):
     REPORT_URLS = report_card_urls(id_list)
     REPORT_RAW_DATA = obtain_school_data(REPORT_URLS, DATA_SET)
-
-    REPORT_RAW_DATA.to_csv(
-        r"C:\Users\Sachit Deshmukh\Documents\Python Scripts\JPAL_UDISE_DATA_EXTRACTION\outputs\temp_2.csv"
-    )
-
-    return REPORT_RAW_DATA
+    save_csv_file(REPORT_RAW_DATA)
 
 
 if __name__ == "__main__":
