@@ -24,7 +24,17 @@ async def single_get_call(url: str, data_set: str, logger: logging.Logger):
     """
     try:
         python_output = await get_all_api_url.make_get_call(url)
-        return python_output["data"][data_set]
+        school_data = python_output["data"][data_set]
+        if type(school_data) == list:  # LIST OF DICTIONARIES
+            for data in school_data:
+                data["api_url"] = url
+            return school_data
+        elif type(school_data) == dict:
+            school_data["api_url"] = url
+            return school_data
+        else:
+            logger.debug("Output data from API call is neither a list or a dictionary.")
+            return school_data
     except Exception as e:
         logger.debug(f"No school data found for url: {url} due to error: {e}")
 
