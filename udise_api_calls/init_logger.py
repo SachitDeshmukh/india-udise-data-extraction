@@ -29,8 +29,8 @@ def main(module_name):
     LOG_FROMAT = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
-    info_file = str(api_config.LOGS_PATH + "/info.log")
-    debug_file = str(api_config.LOGS_PATH + "/debug.log")
+    info_file = api_config.LOGS_PATH / "info.log"
+    debug_file = api_config.LOGS_PATH / "debug.log"
 
     # INITIALIZE INFO AND DEBUG HANDLERS
     logger = init_logger(

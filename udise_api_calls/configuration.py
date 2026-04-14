@@ -1,7 +1,12 @@
 # NOTING ALL CONFIG SETTING HERE
-LOGS_PATH = (
-    r"C:\Users\Sachit Deshmukh\Documents\Python Scripts\JPAL_UDISE_Data_Extraction\logs"
-)
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+LOGS_PATH = PROJECT_ROOT / "logs"
+OUTPUT_DIR = PROJECT_ROOT / "outputs"
+# Create them if they don't exist
+LOGS_PATH.mkdir(exist_ok=True)
+OUTPUT_DIR.mkdir(exist_ok=True)
 
 UDISE_API_BASE_URL = "https://kys.udiseplus.gov.in/webapp/api/"
 API_RETRIES = 5

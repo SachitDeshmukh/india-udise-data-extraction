@@ -10,7 +10,7 @@ from udise_api_calls import obtain_school_data
 
 # Defining GLOBALS
 FILE_NAME_BASE = api_config.EXCEL_FILE_BASE_TEXT
-OUTPUT_DIR = r"C:\Users\Sachit Deshmukh\Documents\Python Scripts\JPAL_UDISE_DATA_EXTRACTION\outputs"
+OUTPUT_DIR = api_config.OUTPUT_DIR
 LOGGER = init_logger.main(__name__)
 
 
@@ -20,8 +20,8 @@ def save_data_to_file(data: pd.DataFrame):
     data_frame = data
 
     try:
-        csv_file_path = str(
-            OUTPUT_DIR + f"/{FILE_NAME_BASE}_{version_date}_{version_time}.csv"
+        csv_file_path = (
+            OUTPUT_DIR / f"{FILE_NAME_BASE}_{version_date}_{version_time}.csv"
         )
         data_frame.to_csv(csv_file_path)
         LOGGER.info(f"All school level data has been saved to file: {csv_file_path}")

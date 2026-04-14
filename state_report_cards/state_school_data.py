@@ -79,10 +79,6 @@ def main() -> pd.DataFrame:
 
     RAW_DATA = obtain_school_data(URL_LIST, DATA_SET)
 
-    # RAW_DATA.to_csv(
-    #     r"C:\Users\Sachit Deshmukh\Documents\Python Scripts\JPAL_UDISE_DATA_EXTRACTION\outputs\temp.csv"
-    # )
-
     return RAW_DATA
 
 
