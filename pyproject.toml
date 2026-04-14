@@ -1,0 +1,17 @@
+[project]
+name = "udise-data-extraction"
+version = "0.1.0"
+description = "Extract UDISE+ Know Your School data"
+requires-python = ">=3.13"
+dependencies = [
+    "selenium>=4.18.1",
+    "pandas>=2.2.3",
+    "joblib>=1.5.3",
+    "aiohttp>=3.13.4",
+    "requests>=2.32.5",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0",
+]

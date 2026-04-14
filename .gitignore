@@ -1,8 +1,5 @@
 **/__pycache__
-**/*.xlsx
-**/*.pdf
 backend_resources
 **/outputs
-venv
+venv/
 logs/
-*.egg-info/
