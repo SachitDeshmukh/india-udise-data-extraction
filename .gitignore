@@ -3,3 +3,4 @@ backend_resources
 **/outputs
 .venv/
 logs/
+*.egg-info/
