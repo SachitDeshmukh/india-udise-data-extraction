@@ -5,7 +5,7 @@
 import logging
 from functools import wraps
 import inspect
-from udise_api_calls import configuration as api_config
+from udise_api_calls import api_config
 
 
 def init_logger(

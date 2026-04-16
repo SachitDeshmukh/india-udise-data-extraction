@@ -8,7 +8,7 @@ OUTPUT_DIR = PROJECT_ROOT / "outputs"
 LOGS_PATH.mkdir(exist_ok=True)
 OUTPUT_DIR.mkdir(exist_ok=True)
 
-UDISE_API_BASE_URL = "https://kys.udiseplus.gov.in/webapp/api/"
+UDISE_API_BASE_URL = "https://kys.udiseplus.gov.in/web-app/api/"
 API_RETRIES = 5
 API_TIMEOUT = 15  # 15 SECONDS
 URL_CHUNKS = 100

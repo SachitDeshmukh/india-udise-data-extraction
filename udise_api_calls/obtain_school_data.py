@@ -2,12 +2,12 @@
 
 import pandas as pd
 import asyncio
-from joblib import Parallel, delayed
-from udise_api_calls import init_logger
-from udise_api_calls import configuration as api_config
-from udise_api_calls import get_all_api_url
 import logging
 import os
+from joblib import Parallel, delayed
+from udise_api_calls import api_config
+from udise_api_calls import def_log_main, def_log_dec
+from udise_api_calls import api_url_call, api_url_main
 
 
 def yield_url_batches(url_list: list):
@@ -23,7 +23,7 @@ async def single_get_call(url: str, data_set: str, logger: logging.Logger):
     Fetch and extract school data for a single URL.
     """
     try:
-        python_output = await get_all_api_url.make_get_call(url)
+        python_output = await api_url_call(url)
         school_data = python_output["data"][data_set]
         if type(school_data) == list:  # LIST OF DICTIONARIES
             for data in school_data:
@@ -50,7 +50,7 @@ async def async_fire_api(url_batch: list, data_set: str) -> list:
 
     # PREVENT DUPLICATE PROCESSEES IF HANDDLER ALREADY EXITS
     if not LOGGER.handlers:
-        LOGGER = init_logger.main(logger_name)
+        LOGGER = def_log_main(logger_name)
 
     all_school_data = []
 
@@ -98,7 +98,7 @@ def get_pandas_dataframe(data: list) -> pd.DataFrame:
     return final_data
 
 
-@init_logger.log_documentation_decorator
+@def_log_dec
 def main():
     """
     1. Generate list of URL batches for parsing through parallel workers.
@@ -107,7 +107,7 @@ def main():
     """
 
     # STEP 1
-    API_URL_LIST = get_all_api_url.main()
+    API_URL_LIST = api_url_main()
     URL_BATCHES = list(yield_url_batches(API_URL_LIST))
     DATA_SET = api_config.API_DATA_SET_LEVEL_1
 
@@ -132,5 +132,5 @@ def main():
 
 
 if __name__ == "__main__":
-    LOGGER = init_logger.main(__name__)
+    LOGGER = def_log_main(__name__)
     main()

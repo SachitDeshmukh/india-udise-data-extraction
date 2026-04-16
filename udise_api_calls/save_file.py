@@ -2,16 +2,15 @@
 
 import pandas as pd
 from datetime import datetime
-
-from udise_api_calls import init_logger
-from udise_api_calls import configuration as api_config
-from udise_api_calls import obtain_school_data
+from udise_api_calls import api_config
+from udise_api_calls import def_log_main, def_log_dec
+from udise_api_calls import scl_data_main
 
 
 # Defining GLOBALS
 FILE_NAME_BASE = api_config.EXCEL_FILE_BASE_TEXT
 OUTPUT_DIR = api_config.OUTPUT_DIR
-LOGGER = init_logger.main(__name__)
+LOGGER = def_log_main(__name__)
 
 
 def save_data_to_file(data: pd.DataFrame):
@@ -30,9 +29,9 @@ def save_data_to_file(data: pd.DataFrame):
         LOGGER.debug(f"Data was not saved due to error: {e}")
 
 
-@init_logger.log_documentation_decorator
+@def_log_dec
 def main():
-    all_data = obtain_school_data.main()
+    all_data = scl_data_main()
     save_data_to_file(all_data)
 
 

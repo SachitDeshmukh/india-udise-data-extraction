@@ -2,14 +2,15 @@
 
 import aiohttp
 import asyncio
-from udise_api_calls import init_logger
-from udise_api_calls import configuration as api_config
+from udise_api_calls import api_config
+from udise_api_calls import def_log_main, def_log_dec
+
 
 # Defining the GLOBALS
 BASE_URL: str = api_config.UDISE_API_BASE_URL
 API_RETRIES = api_config.API_RETRIES
 API_TIMEOUT = api_config.API_TIMEOUT
-LOGGER = init_logger.main(__name__)
+LOGGER = def_log_main(__name__)
 
 
 async def wait_for_attempt():
@@ -133,7 +134,7 @@ def state_districts_urls(id_pair_list: list) -> list:
     return all_call_urls
 
 
-@init_logger.log_documentation_decorator
+@def_log_dec
 def main():
     """
     1. Define the first API GET call url
