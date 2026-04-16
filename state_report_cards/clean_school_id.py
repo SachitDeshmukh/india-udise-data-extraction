@@ -4,12 +4,12 @@ THIS FILE WILL RETURN LIST OF SCHOOL IDS FOR RELEVANT SCHOOLS FOR MATH GAMES SCA
 
 # IMPORTING NECESSARY LIBRARIES
 import pandas as pd
-import udise_api_calls.init_logger as def_log  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
+from udise_api_calls import *
 import state_report_cards.state_school_data as report_raw
 from state_report_cards import configuration as report_config
 
 # DEFINING THE GLOBALS
-LOGGER = def_log.main(__name__)
+LOGGER = def_log_main(__name__)
 
 
 def drop_extra_columns(dataframe: pd.DataFrame, col_list: list) -> pd.DataFrame:
@@ -62,7 +62,7 @@ def obtain_school_ids(dataframe: pd.DataFrame) -> list:
     return school_ids
 
 
-@def_log.log_documentation_decorator
+@def_log_dec
 def main(dataframe: pd.DataFrame) -> list:
     """
     Cleans the data and outputs the school IDs of relevant schools for Math Games.

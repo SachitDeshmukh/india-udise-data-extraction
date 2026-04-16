@@ -4,14 +4,11 @@ THIS FILE WILL RETURN DATAFRAME OF INITIAL API RESPONSES FOR SELECT STATE AND DI
 
 # IMPORTING NECESSARY LIBRARIES
 import pandas as pd
-import udise_api_calls.get_all_api_url as api_url  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
-import udise_api_calls.init_logger as def_log  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
-import udise_api_calls.obtain_school_data as scl_data  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
-from udise_api_calls import configuration as api_config
+from udise_api_calls import *
 from state_report_cards import configuration as report_config
 
 # DEFINING THE GLOBALS
-LOGGER = def_log.main(__name__)
+LOGGER = def_log_main(__name__)
 DATA_SET = api_config.API_DATA_SET_LEVEL_1
 
 
@@ -47,22 +44,20 @@ def get_urls(id_pairs: list) -> list:
     ---
         list of str entries of api call urls
     """
-    url_list = api_url.state_districts_urls(id_pair_list=id_pairs)
+    url_list = api_url_pair(id_pair_list=id_pairs)
     # Log status from imported module
 
     return url_list
 
 
 def obtain_school_data(url_list: list, data_set) -> pd.DataFrame:
-    raw_school_data = scl_data.obtain_school_data(url_list, data_set)
-    raw_dataframe = scl_data.get_pandas_dataframe(
-        raw_school_data
-    )  # Prints the dataframe shape
+    raw_school_data = scl_data_obtain(url_list, data_set)
+    raw_dataframe = scl_data_frame(raw_school_data)  # Prints the dataframe shape
 
     return raw_dataframe
 
 
-@def_log.log_documentation_decorator
+@def_log_dec
 def main() -> pd.DataFrame:
     """
     Obtain daraframe of raw school level data for select state-district combinations.
