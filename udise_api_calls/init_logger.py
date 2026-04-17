@@ -20,37 +20,8 @@ def init_logger(
     log_handler.addFilter(lambda r: r.levelno == log_filter)
     log_handler.setFormatter(formatter)
 
-    logger.addHandler(log_handler)
-
-    return logger
-
-
-def main(module_name):
-    LOG_FROMAT = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    info_file = api_config.LOGS_PATH / "info.log"
-    debug_file = api_config.LOGS_PATH / "debug.log"
-
-    # INITIALIZE INFO AND DEBUG HANDLERS
-    logger = init_logger(
-        logger_name=module_name,
-        formatter=LOG_FROMAT,
-        handler_file=info_file,
-        log_filter=logging.INFO,
-    )
-    logger = init_logger(
-        logger_name=module_name,
-        formatter=LOG_FROMAT,
-        handler_file=debug_file,
-        log_filter=logging.DEBUG,
-    )
-
-    # INITIALIZE CONSOLE HANDLER
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.WARNING)  # Only warnings+ go to console
-    console_handler.setFormatter(LOG_FROMAT)
-    logger.addHandler(console_handler)
+    if not log_handler in logger.handlers:
+        logger.addHandler(log_handler)
 
     return logger
 
@@ -72,6 +43,39 @@ def log_documentation_decorator(function):
         return result
 
     return wrapper
+
+
+@log_documentation_decorator
+def main(module_name):
+    LOG_FROMAT = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    info_file = api_config.LOGS_PATH / "info.log"
+    debug_file = api_config.LOGS_PATH / "debug.log"
+
+    # INITIALIZE INFO AND DEBUG HANDLERS
+    LOGGER = init_logger(
+        logger_name=module_name,
+        formatter=LOG_FROMAT,
+        handler_file=info_file,
+        log_filter=logging.INFO,
+    )
+    LOGGER = init_logger(
+        logger_name=module_name,
+        formatter=LOG_FROMAT,
+        handler_file=debug_file,
+        log_filter=logging.DEBUG,
+    )
+
+    # INITIALIZE CONSOLE HANDLER
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.WARNING)  # Only warnings+ go to console
+    console_handler.setFormatter(LOG_FROMAT)
+
+    if not console_handler in LOGGER.handlers:
+        LOGGER.addHandler(console_handler)
+
+    return LOGGER
 
 
 if __name__ == "__main__":
