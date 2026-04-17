@@ -6,7 +6,7 @@ THIS FILE WILL STORE RAW REPORT CARD DATA FROM API CALLS INTO CSV FILE.
 import pandas as pd
 from joblib import Parallel, delayed
 from udise_api_calls import *
-import state_report_cards.state_school_data as report_raw  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
+import state_report_cards.state_school_data as report_level_1  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
 import state_report_cards.clean_school_id as clean_id  # ENSURE INSTALLATION OF JPALUDISE FOR ABSOLUTE IMPORT
 
 from state_report_cards import configuration as report_config
@@ -63,22 +63,20 @@ def obtain_school_data(url_list: list, data_set) -> pd.DataFrame:
     return report_card_raw
 
 
-def save_csv_file(data: pd.DataFrame):
-    save_csv(data)
-
-
 @def_log_dec
 def main(id_list):
     REPORT_URLS = report_card_urls(id_list)
     REPORT_RAW_DATA = obtain_school_data(REPORT_URLS, DATA_SET)
-    save_csv_file(REPORT_RAW_DATA)
+    # save_csv(REPORT_RAW_DATA)
+
+    return REPORT_RAW_DATA
 
 
 if __name__ == "__main__":
     data: pd.DataFrame = (
-        report_raw.main()
+        report_level_1.main()
     )  # Ensures that the output from main() is a pandas DataFrame
 
-    id_list = clean_id.main(data)
+    id_list, filtered_data = clean_id.main(data)
 
     main(id_list)

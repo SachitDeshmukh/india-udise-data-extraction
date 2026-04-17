@@ -40,5 +40,9 @@ FILTER_SCHOOL_VALUES = {
     ],
 }
 
-# REPORT CARD CSV
+# REPORT CARD RAW
 API_DATA_SET_LEVEL_2 = "schEnrollmentYearDataTotal"
+
+# REPORT CARD CLEAN
+URL_COL = "api_url"  # dataframe column to retrospectively extract school IDs
+MERGE_COL = "schoolId"  # dataframe column where the common value is stored

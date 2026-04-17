@@ -5,7 +5,7 @@ THIS FILE WILL RETURN LIST OF SCHOOL IDS FOR RELEVANT SCHOOLS FOR MATH GAMES SCA
 # IMPORTING NECESSARY LIBRARIES
 import pandas as pd
 from udise_api_calls import *
-import state_report_cards.state_school_data as report_raw
+import state_report_cards.state_school_data as report_level_1
 from state_report_cards import configuration as report_config
 
 # DEFINING THE GLOBALS
@@ -63,13 +63,13 @@ def obtain_school_ids(dataframe: pd.DataFrame) -> list:
 
 
 @def_log_dec
-def main(dataframe: pd.DataFrame) -> list:
+def main(dataframe: pd.DataFrame):
     """
     Cleans the data and outputs the school IDs of relevant schools for Math Games.
 
     Return
     ---
-        List of school IDs.
+        List of school IDs and the filtered data.
     """
     try:
         # Dataframe does not have empty values in targer columns
@@ -85,7 +85,7 @@ def main(dataframe: pd.DataFrame) -> list:
             f"{len(SCHOOL_IDS)} school IDs of functional schools for state-district combination obtained."
         )
 
-        return SCHOOL_IDS
+        return SCHOOL_IDS, filter_data
 
     except Exception as e:
         LOGGER.debug(f"School IDs of functional school not obtained due to error: {e}")
@@ -93,7 +93,7 @@ def main(dataframe: pd.DataFrame) -> list:
 
 if __name__ == "__main__":
     data: pd.DataFrame = (
-        report_raw.main()
+        report_level_1.main()
     )  # Ensures that the output from main() is a pandas DataFrame
 
     main(data)
