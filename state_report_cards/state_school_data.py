@@ -58,13 +58,11 @@ def obtain_school_data(url_list: list, data_set) -> pd.DataFrame:
 
 
 @def_log_dec
-def main() -> pd.DataFrame:
-    """
-    Obtain daraframe of raw school level data for select state-district combinations.
-
-    Return
+def output_level_1_raw() -> pd.DataFrame:
+    """Main function for `state_school_data.py`.
     ---
-        Pandas Dataframe
+
+    Obtain daraframe of raw school level data for select state-district combinations.
     """
     STATE_IDS = report_config.STATE_ID_LIST
     DISTRICT_IDS = report_config.DISTRICT_ID_LIST
@@ -78,4 +76,4 @@ def main() -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    main()
+    output_level_1_raw()

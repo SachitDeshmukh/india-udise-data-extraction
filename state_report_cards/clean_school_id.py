@@ -63,13 +63,11 @@ def obtain_school_ids(dataframe: pd.DataFrame) -> list:
 
 
 @def_log_dec
-def main(dataframe: pd.DataFrame):
-    """
-    Cleans the data and outputs the school IDs of relevant schools for Math Games.
-
-    Return
+def output_school_id_data(dataframe: pd.DataFrame):
+    """Main function for `clean_school_id.py`.
     ---
-        List of school IDs and the filtered data.
+
+    Cleans the data and outputs the school IDs of relevant schools for Math Games.
     """
     try:
         # Dataframe does not have empty values in targer columns
@@ -93,7 +91,7 @@ def main(dataframe: pd.DataFrame):
 
 if __name__ == "__main__":
     data: pd.DataFrame = (
-        report_level_1.main()
-    )  # Ensures that the output from main() is a pandas DataFrame
+        report_level_1.output_level_1_raw()
+    )  # Ensures that the output from output_level_1_raw() is a pandas DataFrame
 
-    main(data)
+    output_school_id_data(data)

@@ -64,19 +64,24 @@ def obtain_school_data(url_list: list, data_set) -> pd.DataFrame:
 
 
 @def_log_dec
-def main(id_list):
+def output_level_2_raw(id_list):
+    """Main function for `report_card_raw.py`.
+    ---
+
+    Obtain daraframe of raw enrollment data for select schools.
+    """
+
     REPORT_URLS = report_card_urls(id_list)
     REPORT_RAW_DATA = obtain_school_data(REPORT_URLS, DATA_SET)
-    # save_csv(REPORT_RAW_DATA)
 
     return REPORT_RAW_DATA
 
 
 if __name__ == "__main__":
     data: pd.DataFrame = (
-        report_level_1.main()
-    )  # Ensures that the output from main() is a pandas DataFrame
+        report_level_1.output_level_1_raw()
+    )  # Ensures that the output from output_level_1_raw() is a pandas DataFrame
 
-    id_list, filtered_data = clean_id.main(data)
+    id_list, filtered_data = clean_id.output_school_id_data(data)
 
-    main(id_list)
+    output_level_2_raw(id_list)

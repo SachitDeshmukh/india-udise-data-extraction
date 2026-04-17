@@ -55,15 +55,13 @@ def merge_dataframes(
 
 
 @def_log_dec
-def output_clean_csv(dataframe_1, dataframe_2, col_name):
-    """
-    Main function for `report_card_clean.py`.
+def output_clean_data(dataframe_1, dataframe_2, col_name):
+    """Main function for `report_card_clean.py`.
     ---
 
     Merge datasets and save resulting dataframe in a CSV file.
     """
     clean_data = merge_dataframes(dataframe_1, dataframe_2, col_name)
-    save_csv(clean_data)
 
     return clean_data
 
@@ -71,12 +69,12 @@ def output_clean_csv(dataframe_1, dataframe_2, col_name):
 if __name__ == "__main__":
     LOGGER = def_log_main(__name__)
 
-    LEVEL_1_RAW = report_level_1.main()
-    ID_LIST, LEVEL_1_CLEAN = clean_id.main(LEVEL_1_RAW)
+    LEVEL_1_RAW = report_level_1.output_level_1_raw()
+    ID_LIST, LEVEL_1_CLEAN = clean_id.output_school_id_data(LEVEL_1_RAW)
 
-    LEVEL_2_RAW = report_level_2.main(ID_LIST)
+    LEVEL_2_RAW = report_level_2.output_level_2_raw(ID_LIST)
     URL_COL = report_config.URL_COL
     LEVEL_2_CLEAN = add_school_id_to_data(LEVEL_2_RAW, URL_COL)
 
     COL_NAME = report_config.MERGE_COL
-    output_clean_csv(LEVEL_1_CLEAN, LEVEL_2_CLEAN, COL_NAME)
+    output_clean_data(LEVEL_1_CLEAN, LEVEL_2_CLEAN, COL_NAME)
